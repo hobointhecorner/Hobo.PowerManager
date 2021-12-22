@@ -386,101 +386,81 @@ function Start-PMJob
 {
     [cmdletbinding()]
     param(
-        [parameter(Mandatory)]
+        [parameter(Mandatory, Position=0)]
         [string]$PMHost,
+
+        [parameter(Position = 1)]
         [string[]]$DatastoreList,
+
+        [parameter(Position = 2)]
         [string[]]$VmExclusionList,
+
+        [parameter(Position = 3)]
         [pscredential]$Credential,
+
+        [parameter(Position = 4)]
         [timespan]$PollingInterval = "00:00:30",
+
+        [parameter(Position = 5)]
         [bool]$Wait = $false
     )
 
     begin
     {
-        $argList = @(
-            $PMHost,
-            $DatastoreList,
-            $VmExclusionList,
-            $Credential,
-            $PollingInterval,
-            $Wait
-        )
+        $lastDsRescan = [datetime]::MinValue
+        $vmParam = @{}
 
-        $sb_StartVmJob = {
-            [cmdletbinding()]
-            param(
-                [string]$PMHost,
-                [string[]]$DatastoreList,
-                [string[]]$VmExclusionList,
-                [pscredential]$Credential,
-                [timespan]$PollingInterval,
-                [bool]$Wait
-            )
-
-            begin
-            {
-                $lastDsRescan = [datetime]::MinValue
-                $vmParam = @{}
-                if ($DatastoreList)
-                {
-                    $dsConnected = $false
-                    $vmParam.Add('Datastore', $DatastoreList)
-                }
-                else
-                {
-                    $dsConnected = $true
-                }
-
-                Write-PMOutput "Connecting to $PMHost"
-                $connection = Connect-PMHost $PMHost -Credential $Credential -PassThru
-            }
-
-            process
-            {
-                while ($dsConnected -eq $false)
-                {
-                    $connectedDatastores = Get-Datastore -Server $PMHost | Where-Object { $_.Name -iin $DatastoreList } | Select-Object -ExpandProperty Name
-                    if (!(Compare-Object $connectedDatastores $DatastoreList))
-                    {
-                        $dsConnected = $true
-                    }
-
-                    if (!$dsConnected)
-                    {
-                        if ($lastDsRescan -lt (Get-Date).AddMinutes(-5))
-                        {
-                            Write-PMOutput "Rescanning storage adapters on $PMHost"
-                            Get-VMHostStorage -RescanAllHba -Server $PMHost | Out-Null
-                        }
-
-                        Start-Sleep -Seconds 30
-                    }
-                }
-
-                $vmList = Get-VM @vmParam |
-                            Where-Object { $_.PowerState -ieq 'PoweredOff' } |
-                            Where-Object { $_.Name -inotin $vmExclusionList }
-
-                $vmCount = $vmList | Measure-Object | Select-Object -ExpandProperty Count
-                Write-PMOutput "Starting $vmCount vm(s) on host $pmHost..."
-                $vmList | Start-VM
-
-                while ($Wait -and $connection.IsConnected)
-                {
-                    Start-Sleep -Seconds $PollingInterval.Seconds
-                }
-
-                Write-PMOutput "Disconnected from host $PMHost"
-            }
+        if ($DatastoreList)
+        {
+            $dsConnected = $false
+            $vmParam.Add('Datastore', $DatastoreList)
         }
+        else
+        {
+            $dsConnected = $true
+        }
+
+        Write-PMOutput "Connecting to $PMHost"
+        $connection = Connect-PMHost $PMHost -Credential $Credential -PassThru
     }
 
     process
     {
-        Start-PsBackgroundJob -Name $PMHost `
-            -Module PowerManager -Category PMHost `
-            -ScriptBlock $sb_StartVmJob -ArgumentList $argList `
-            -PassThru
+        while ($dsConnected -eq $false)
+        {
+            $connectedDatastores = Get-Datastore -Server $PMHost | Where-Object { $_.Name -iin $DatastoreList } | Select-Object -ExpandProperty Name
+            if (!(Compare-Object $connectedDatastores $DatastoreList))
+            {
+                $dsConnected = $true
+            }
+
+            if (!$dsConnected)
+            {
+                if ($lastDsRescan -lt (Get-Date).AddMinutes(-5))
+                {
+                    Write-PMOutput "Rescanning storage adapters on $PMHost"
+                    Get-VMHostStorage -RescanAllHba -Server $PMHost | Out-Null
+                }
+
+                Start-Sleep -Seconds 30
+            }
+        }
+
+        $vmList = Get-VM @vmParam |
+                    Where-Object { $_.PowerState -ieq 'PoweredOff' } |
+                    Where-Object { $_.Name -inotin $vmExclusionList }
+
+        $vmCount = $vmList | Measure-Object | Select-Object -ExpandProperty Count
+        Write-PMOutput "Starting $vmCount vm(s) on host $pmHost..."
+        if ($vmCount -gt 0) { Write-PMOutput "vm(s): $($vmList -join ', ')" }
+        $vmList | Start-VM
+
+        while ($Wait -and $connection.IsConnected)
+        {
+            Start-Sleep -Seconds $PollingInterval.Seconds
+        }
+
+        Write-PMOutput "Disconnected from host $PMHost"
     }
 }
 
@@ -573,6 +553,14 @@ function Start-PowerManager
         $lastConfigRefresh = [datetime]::MinValue
 
         Get-PMJob -Category PMHost | Remove-PsBackgroundJob -Force
+
+        $jobArgList = @(
+            $Datastore,
+            $Exclusion,
+            $Credential,
+            $PollingInterval,
+            $Wait
+        )
     }
 
     process
@@ -613,7 +601,12 @@ function Start-PowerManager
                     $jobList = Get-PMJob -Category PMHost
                     $hostList |
                         Where-Object { $_ -inotin $jobList.Name } |
-                        ForEach-Object { Start-PMJob -PMHost $_ -DatastoreList $dsList -VmExclusionList $vmExclusionList -Credential $Credential -PollingInterval $PollingInterval -Wait:$Wait } |
+                        ForEach-Object {
+                            Start-PsBackgroundJob -Name $_ `
+                                -Module PowerManager -Category PMHost `
+                                -ScriptBlock ${Function:Start-PMJob} -ArgumentList (@($_) + $jobArgList) `
+                                -PassThru
+                            } |
                             Out-Null
                 }
             }
