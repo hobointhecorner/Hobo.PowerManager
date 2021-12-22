@@ -7,3 +7,9 @@
 [submodule "Hobo.PowerManager/modules/Hobo.BackgroundJob"]
 	path = Hobo.PowerManager/modules/Hobo.BackgroundJob
 	url = git@github.com:hobointhecorner/Hobo.BackgroundJob.git
+[submodule "ansible/roles/Hobo.Ansible.Common"]
+	path = ansible/roles/Hobo.Ansible.Common
+	url = git@github.com:hobointhecorner/Hobo.Ansible.Common.git
+[submodule "ansible/roles/Hobo.Ansible.Docker"]
+	path = ansible/roles/Hobo.Ansible.Docker
+	url = git@github.com:hobointhecorner/Hobo.Ansible.Docker.git
