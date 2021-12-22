@@ -81,6 +81,7 @@ FunctionsToExport = @(
     'Set-PMCredential',
     'Connect-PMHost',
     'Disconnect-PMHost',
+    'Write-PMOutput',
     'Update-PMHostStorage',
     'Start-PowerManager'
 )
