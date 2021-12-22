@@ -18,7 +18,7 @@ Configuration of the container is handled via inventory variables.  By default, 
 | pm_config_dir                  | false    | string       | /opt/powermanager | Destination directory for powermanager config files |
 | pm_container_registry          | false    | string       | ghcr.io | The container registry from which you're pulling powermanager |
 | pm_container_name              | false    | string       | hobointhecorner/hobo.powermanager | The powermanager container to pull |
-| pm_container_tag               | false    | string       | latest  | The tag of the container to pull |
+| pm_container_tag               | false    | string       | stable  | The tag of the container to pull. Can be `latest`, `stable`, or any tagged version |
 | pm_container_registry_username | false    | string       |         | The username with which to authenticate to the container registry |
 | pm_container_registry_password | false    | string       |         | The password with which to authenticate to the container registry |
 
