@@ -9,7 +9,7 @@ PowerShell module to ensure VMs are powered on after loss of connection to a VMW
 
 ## Container Management
 ### Build the Container
-`docker build . -t ghcr.io/hobointhecorner/hobo.powermanager:latest`
+`docker build . -t ghcr.io/hobointhecorner/hobo.powermanager:stable`
 
 ### Run the Container
-`docker run gchr.io/hobointhecorner/hobo.powermanager:latest Start-PowerManager`
+`docker run gchr.io/hobointhecorner/hobo.powermanager:stable Start-PowerManager`
