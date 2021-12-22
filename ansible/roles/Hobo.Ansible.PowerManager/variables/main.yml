@@ -1,0 +1,8 @@
+---
+pm_hosts:
+pm_datastores:
+pm_exclusions:
+pm_username:
+pm_password:
+pm_container_registry_username:
+pm_container_registry_password:

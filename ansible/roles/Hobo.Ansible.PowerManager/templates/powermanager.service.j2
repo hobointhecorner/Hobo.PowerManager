@@ -1,0 +1,16 @@
+[Unit]
+Description=PowerManager
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+{% if pm_login_required %}
+ExecStartPre=-{{ pm_config_dir }}/docker_login.sh
+{% endif %}
+ExecStart=/usr/bin/docker run --pull always --rm --env-file {{ pm_config_dir }}/.env --name powermanager {{ pm_container }} Start-PowerManager {{ pm_additional_parameters|join(' ') }}
+ExecStop=-/usr/bin/docker stop powermanager
+
+[Install]
+WantedBy=multi-user.target

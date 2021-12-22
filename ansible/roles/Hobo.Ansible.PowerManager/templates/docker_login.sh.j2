@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cat {{ pm_config_dir }}/.registry_token | docker login {{ pm_container_registry }} -u {{ pm_container_registry_username }} --password-stdin

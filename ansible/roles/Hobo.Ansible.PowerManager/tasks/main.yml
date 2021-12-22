@@ -1,0 +1,63 @@
+---
+- name: Set facts
+  set_fact:
+    pm_container: "{{ pm_container_registry }}/{{ pm_container_name }}:{{ pm_container_tag }}"
+    pm_login_required: >-
+      {% if pm_container_registry_username is defined and pm_container_registry_password is defined -%}
+      {{ true }}
+      {%- else -%}
+      {{ false }}
+      {%- endif %}
+
+- name: Ensure config directory
+  become: yes
+  file:
+    path: "{{ pm_config_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "2660"
+
+- name: Template config files
+  become: yes
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: "templates/.env.j2",                 dest: "{{ pm_config_dir }}/.env" }
+    - { src: "templates/powermanager.service.j2", dest: "/etc/systemd/system/powermanager.service"}
+  notify:
+    - Reload powermanager service
+
+- when: pm_login_required
+  block:
+    - name: Ensure registry token file
+      become: yes
+      copy:
+        dest: "{{ pm_config_dir }}/.registry_token"
+        content: "{{ pm_container_registry_password }}"
+        owner: root
+        group: root
+        mode: "660"
+
+    - name: Ensure registry login script
+      become: yes
+      template:
+        src: templates/docker_login.sh.j2
+        dest: "{{ pm_config_dir }}/docker_login.sh"
+        owner: root
+        group: root
+        mode: "775"
+
+    - name: Docker login
+      docker_login:
+        registry: "{{ pm_container_registry }}"
+        username: "{{ pm_container_registry_username }}"
+        password: "{{ pm_container_registry_password }}"
+
+- name: Pull container image
+  docker_image:
+    name: "{{ pm_container }}"
+    source: pull
+  notify:
+    - Reload powermanager service
