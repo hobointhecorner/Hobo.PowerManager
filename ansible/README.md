@@ -21,6 +21,7 @@ Configuration of the container is handled via inventory variables.  By default, 
 | pm_container_tag               | false    | string       | stable  | The tag of the container to pull. Can be `latest`, `stable`, or any tagged version |
 | pm_container_registry_username | false    | string       |         | The username with which to authenticate to the container registry |
 | pm_container_registry_password | false    | string       |         | The password with which to authenticate to the container registry |
+| pm_additional_parameters       | false    | list(string) |         | Any additional command-line parameters to pass to the Start-PowerManager cmdlet |
 
 ### Example inventory/main.yml
 ```
