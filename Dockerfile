@@ -6,3 +6,4 @@ COPY ["Hobo.PowerManager", "/usr/local/share/powershell/Modules/Hobo.PowerManage
 RUN pwsh -command /usr/local/share/powershell/Modules/Hobo.PowerManager/Install-PowerManager.ps1
 
 ENTRYPOINT [ "pwsh", "-Command" ]
+
