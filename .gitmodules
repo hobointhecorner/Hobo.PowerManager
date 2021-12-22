@@ -1,0 +1,9 @@
+[submodule "Hobo.PowerManager/modules/Hobo.Pref"]
+	path = Hobo.PowerManager/modules/Hobo.Pref
+	url = git@github.com:hobointhecorner/Hobo.Pref.git
+[submodule "Hobo.PowerManager/modules/Hobo.Log"]
+	path = Hobo.PowerManager/modules/Hobo.Log
+	url = git@github.com:hobointhecorner/Hobo.Log.git
+[submodule "Hobo.PowerManager/modules/Hobo.BackgroundJob"]
+	path = Hobo.PowerManager/modules/Hobo.BackgroundJob
+	url = git@github.com:hobointhecorner/Hobo.BackgroundJob.git
