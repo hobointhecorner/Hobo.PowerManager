@@ -492,6 +492,59 @@ function Start-PMJob
 # Main functionality
 #
 
+<#
+
+.SYNOPSIS
+Ensure VMs are powered-on on a VMWare ESXi host
+
+.DESCRIPTION
+Power on VMs on a VMWare ESXi server
+
+.PARAMETER PMHost
+VMWare hosts to connect to and power on VMs
+
+.PARAMETER Datastore
+Datastores that must be available before continuing with VM power-on operations
+
+.PARAMETER Exclusions
+VMs to ignore when performing power-on operations
+
+.PARAMETER Credential
+Credentials to use when connecting to VMWare ESXi hosts
+
+.PARAMETER Wait
+Continuously monitor connection state to ESXi hosts and power on VMs if connection is lost
+
+.PARAMETER ConfigRefresh
+Enable periodic configuration refresh
+
+.PARAMETER ConfigRefreshInterval
+The minimum amount of time to wait between configuration refreshes when ConfigRefresh is enabled
+
+.PARAMETER PollingInterval
+The minimum amount of time between host connecivity checks
+
+.PARAMETER OutputInterval
+The minimum amount of time between job status checks
+
+.EXAMPLE
+# Run PowerManager using pre-configured parameters
+Start-PowerManager
+
+.EXAMPLE
+# Continuously monitor hosts using pre-configured parameters
+Start-PowerManager -Wait
+
+.EXAMPLE
+# Same as above, but with configuration refresh enabled and extended connectivity check interval
+Start-PowerManager -Wait -ConfigRefresh -PollingInterval '00:05:00'
+
+.EXAMPLE
+# Run for host 10.0.50.11 and credentials from input
+$hostCredential = Get-Credential
+Start-PowerManager -PmHost 10.0.50.11 -Credential $hostCredential
+
+#>
 function Start-PowerManager
 {
     [cmdletbinding()]
