@@ -59,5 +59,6 @@
   docker_image:
     name: "{{ pm_container }}"
     source: pull
+    force_source: "{{ pm_container_force_pull }}"
   notify:
     - Reload powermanager service
