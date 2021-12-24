@@ -3,4 +3,5 @@ pm_config_dir: /opt/powermanager
 pm_container_registry: ghcr.io
 pm_container_name: hobointhecorner/hobo.powermanager
 pm_container_tag: stable
+pm_container_force_pull: no
 pm_additional_parameters: []
