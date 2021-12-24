@@ -7,8 +7,8 @@ One or more VMWare ESXi servers to connect and power on VM's
 | Info     | Value |
 -----------|-------|
 | **Required** | Yes |
-| **Command**  | `-PMHost (string[])` |
-| **Env**      | `PM_HOSTS=(comma-delimited string)` |
+| **Command**  | `-PMHost <String[]>` |
+| **Env**      | `PM_HOSTS=<comma-delimited String>` |
 | **File**     | `Get-PMPref Host ; Add/Remove-PMPref Host '{{PMHost}}'` |
 
 
@@ -18,8 +18,8 @@ Datastores that should be connected before proceeding with power-on operations
 | Info     | Value |
 -----------|-------|
 | **Required** | No |
-| **Command**  | `-Datastore (string[])` |
-| **Env**      | `PM_DATASTORES=(comma-delimited string)` |
+| **Command**  | `-Datastore <String[]>` |
+| **Env**      | `PM_DATASTORES=<comma-delimited String>` |
 | **File**     | `Get-PMPref Datastore ; Add/Remove-PMPref Datastore '{{Datastore}}'` |
 
 
@@ -29,32 +29,39 @@ Virtual Machines that should be ignored
 | Info     | Value |
 -----------|-------|
 | **Required** | No |
-| **Command**  | `-Exclusion (string[])` |
-| **Env**      | `PM_EXCLUSIONS=(comma-delimited string)` |
+| **Command**  | `-Exclusion <String[]>` |
+| **Env**      | `PM_EXCLUSIONS=<comma-delimited String>` |
 | **File**     | `Get-PMPref VmExclusion ; Add/Remove-PMPref VmExclusion '{{Exclusion}}'` |
 
 
 ### Credential
 Credentials to be used when connecting to ESXi hosts.  Each host must be able to authenticate with at least one of these credential providers.
 
+| Info         | Value |
+---------------|-------|
+| **Required** |  Yes  |
+
 #### Default
 Default credentials can be set as fallback if no host-specific credentials exist
 
 | Info     | Value |
 -----------|-------|
-| **Required** | No |
-| **Command**  | `-Credential (pscredential)` |
-| **Env**      | `PM_USERNAME=(string) PM_PASSWORD=(string)` |
-| **File**     | `Set-PMCredential` |
+| **Env**  | `PM_USERNAME=<String> PM_PASSWORD=<String>` |
+| **File** | `Set-PMCredential` |
 
 #### Host-specific
 Host-specific credentials can be set by replacing `{{PMHost}}` in the following values with the hostname or IP address being used to connect to that host
 
 | Info     | Value |
 -----------|-------|
-| **Required** | No |
-| **Env**      | `PM_USERNAME_{{PMHost}}=(string) PM_PASSWORD_{{PMHost}}=(string)` |
-| **File**     | `Set-PMCredential {{PMHost}}` |
+| **Env**  | `PM_USERNAME_{{PMHost}}=<string> PM_PASSWORD_{{PMHost}}=<string>` |
+| **File** | `Set-PMCredential {{PMHost}}` |
+
+#### Command line parameter
+If the `-Credential` parameter is used that credential will be used to connect to all hosts, regardless of other configured providers
+| Info        | Value |
+--------------|-------|
+| **Command** | `-Credential <PSCredential>` |
 
 
 
