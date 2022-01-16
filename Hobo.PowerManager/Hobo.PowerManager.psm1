@@ -448,7 +448,21 @@ function Start-PMJob
 
         $vmList = Get-VM @vmParam |
                     Where-Object { $_.PowerState -ieq 'PoweredOff' } |
-                    Where-Object { $_.Name -inotin $vmExclusionList }
+                    Where-Object {
+                        $vmName = $_.Name
+                        $include = $true
+
+                        foreach ($excl in $vmExclusionList)
+                        {
+                            if ($vmName -ilike $excl)
+                            {
+                                $include = $false
+                                break
+                            }
+                        }
+
+                        $include
+                    }
 
         $vmCount = $vmList | Measure-Object | Select-Object -ExpandProperty Count
         Write-PMOutput "Starting $vmCount vm(s) on host $pmHost..."
