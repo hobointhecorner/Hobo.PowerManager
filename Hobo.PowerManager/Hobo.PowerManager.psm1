@@ -446,7 +446,6 @@ function Start-PMJob
             }
         }
 
-        # Get powered off VMs
         $vmList = Get-VM @vmParam |
                     Where-Object { $_.PowerState -ieq 'PoweredOff' } |
                     Where-Object {
